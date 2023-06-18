@@ -91,33 +91,33 @@ function createModal(title, content) {
 }
 
 // Helper function to generate categories and add the handler
+// Main placeholder of a category
+const category_template = `
+<div class="card w-50">
+  <div class="card-header">{0}</div>
+  <div class="card-body">
+      <form type="radio" id={0}>
+      </form>
+  </div>
+</div>`
+// Element for a category
+const category_element_template = `
+<div class="form-check">
+  <label class="form-check-label" for="exampleRadios{0}">
+    <input class="form-check-input" type="radio" name="exampleRadios"
+      id="exampleRadios{0}">
+    <text>{1}<text/>
+  </label>
+</div>`
+// Categories-common validation button
+const validation_category_template = `
+<form class="w-100 form-inline d-flex justify-content-center">
+  <button type="submit preferences" class="btn btn-primary mb-2">
+    Confirm parameters
+  </button>
+</form>`
+// Function implementation
 function generateCategoriesAndHandlers() {
-  // All templates needed by the function
-  // Main placeholder of a category
-  const category_template =
-    `<div class="card w-50">
-    <div class="card-header">{0}</div>
-    <div class="card-body">
-        <form type="radio" id={0}>
-        </form>
-    </div>
-  </div>`
-  // Element for a category
-  const category_element_template = `
-  <div class="form-check">
-    <label class="form-check-label" for="exampleRadios{0}">
-      <input class="form-check-input" type="radio" name="exampleRadios"
-        id="exampleRadios{0}">
-      <text>{1}<text/>
-    </label>
-  </div>`
-  // Categories-common validation button
-  const validation_category_template = `
-  <form class="w-100 form-inline d-flex justify-content-center">
-    <button type="submit preferences" class="btn btn-primary mb-2">
-      Confirm parameters
-    </button>
-  </form>`
 
   // Root element for all the categories
   var root_elem = $("#list-parameters");
@@ -138,10 +138,7 @@ function generateCategoriesAndHandlers() {
   // Create the categories wide validation button
   validation_button = $(validation_category_template);
   validation_button.appendTo("#list-parameters");
-
-  // Scroll to the top after adding the elements
-  $("#list-parameters-data-spy").animate({ scrollTop: 0 });
-
+  
   // Local function to handle a click on the button
   function handleClick() {
     // Prevent default behavior
@@ -187,6 +184,86 @@ function generateCategoriesAndHandlers() {
   validation_button.click(handleClick);
 }
 
+// Helper functions to add a user message to the chat
+// Templates
+var user_message_template = `
+<div class="w-100 d-flex justify-content-end">
+  <div class="w-75 alert alert-success" role="alert">
+    {0}
+  </div>
+</div>
+`
+var ai_message_context_template = `
+<div class="w-100 d-flex ajustify-content-start">
+  <div class="w-100 alert alert-info" role="alert">
+    {0}
+  </div>
+</div>
+`
+var ai_message_selection_button_template =`
+<button 
+  type="button" 
+  class="list-group-item list-group-item-action" 
+  id="button-choice-{0}"
+>
+  {1}
+</button>
+`
+var ai_message_selection_template = `
+<div class="w-100 d-flex ajustify-content-start">
+  <div class="w-75 list-group" >
+  </div>
+</div>
+`
+/// Scroll to the last element of the chat
+function scrollLast() {
+  var target = $("#main-chat");
+  var scrollHeight = target.prop("scrollHeight");
+  target.scrollTop(scrollHeight);
+}
+/// Add user message to chat
+function addUserMessage(message) {
+  let box = $(user_message_template.format(message));
+  box.appendTo($("#main-chat"));
+} 
+/// Add AI message to chat
+function addAIContextMessage(message) {
+  let box = $(ai_message_context_template.format(message));
+  box.appendTo($("#main-chat"));
+  scrollLast();
+} 
+// Add message selection modal in bootstrap
+function addAIMessageSelector(options) {
+  var options_elem = $(ai_message_selection_template);
+  var options_elem_list = $(options_elem.find("div.list-group"));
+  console.log(options_elem_list);
+
+  for (var i = 0; i < options.length; i++) {
+    var button = $(ai_message_selection_button_template.format(
+      i,
+      options[i],
+    ));
+    button.appendTo(options_elem_list);
+
+    // Disable all buttons and activate relevant one
+    $(button).click((event) => {
+      // Prevent default behavior
+      event.preventDefault();
+      // Disable all buttons
+      let buttons = $(options_elem.find("div.list-group")).find("button");
+      buttons.prop("disabled", true);
+      // Only toggle wanted button as active
+      $(event.target).addClass("active");
+    });
+  }
+
+  options_elem.appendTo($("#main-chat"));
+  scrollLast();
+}
+
 $(document).ready(function () {
   generateCategoriesAndHandlers();
+  addUserMessage("You decided to code yet another feature");
+  addAIContextMessage("Context: you're trying to sleep ?");
+  addAIMessageSelector([1, 2, 3, 4, 5, ]);
 });
