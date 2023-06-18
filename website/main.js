@@ -28,12 +28,12 @@ const CATEGORIES = {
     "🏡 A mystical garden blooming with rare and powerful herbs",
   ],
   "goal": [
-    "Find a way to break a powerful curse",
-    "Uncover the truth behind a mysterious prophecy",
-    "Retrieve a stolen artifact of immense power",
-    "Restore balance to the enchanted forest",
-    "Discover the source of a spreading corruption",
-    "Save a captured loved one from an evil sorcerer",
+    "🔍 Find a way to break a powerful curse",
+    "🔮 Uncover the truth behind a mysterious prophecy",
+    "🏆 Retrieve a stolen artifact of immense power",
+    "⚖️ Restore balance to the enchanted forest",
+    "🌐 Discover the source of a spreading corruption",
+    "💖 Save a captured loved one from an evil sorcerer",
   ],
   "item": [
     "🔑 A rusty key with an unknown purpose",
@@ -44,6 +44,51 @@ const CATEGORIES = {
     "🗡️ A silver dagger with intricate engravings",
   ]
 };
+
+
+// Additional Style categories
+const Style_CATEGORIES = {
+  "Style": [
+    '🧙‍♂️ Fantasy',
+    '🏰 Medieval',
+    '🌌 Sci-Fi',
+    '🌿 Nature',
+    '🏙️ Urban',
+  ],
+  "Color": [
+    '🔴 Red',
+    '🟠 Orange',
+    '🟡 Yellow',
+    '🟢 Green',
+    '🔵 Blue',
+    '🟣 Purple',
+  ],
+  "Shape": [
+    '⚪ Circle',
+    '⬜ Square',
+    '🔺 Triangle',
+    '🔻 Diamond',
+    '🔘 Rectangle',
+    '🔳 Hexagon',
+  ],
+  "Character": [
+    '👑 King',
+    '👸 Queen',
+    '🧚 Fairy',
+    '🧟 Zombie',
+    '🦄 Unicorn',
+    '🐉 Dragon',
+  ],
+  "Background": [
+    '🌅 Sunset',
+    '🏞️ Mountains',
+    '🌊 Ocean',
+    '🌆 Cityscape',
+    '🌌 Galaxy',
+    '🏝️ Beach',
+  ],
+};
+
 
 // Helper function to replace vars into a string
 String.prototype.format = function () {
@@ -190,7 +235,27 @@ function generateCategoriesAndHandlers() {
     var categoryTitle = $('<div class="w-25">' + toTitleCase(category) + ':</div>');
     categoryTitle.appendTo(categoryLine);
 
-    var selectGroup = $('<div class="form-group w-75"></div>');
+    var selectGroup = $('<div class="form-group w-75 mb-2"></div>');
+    var selectElem = $('<select class="form-control"></select>');
+    selectElem.attr('id', category);
+
+    for (var i = 0; i < items.length; i++) {
+      var option = $('<option value="' + items[i] + '">' + items[i] + '</option>');
+      option.appendTo(selectElem);
+    }
+
+    selectElem.appendTo(selectGroup);
+    selectGroup.appendTo(categoryLine);
+    categoryLine.appendTo(root_elem);
+  });
+
+  // Generate all the inputs from the Style_CATEGORIES constant
+  Object.entries(Style_CATEGORIES).forEach(function ([category, items]) {
+    var categoryLine = $('<div class="w-100 d-flex justify-content-start"></div>');
+    var categoryTitle = $('<div class="w-25">' + toTitleCase(category) + ':</div>');
+    categoryTitle.appendTo(categoryLine);
+
+    var selectGroup = $('<div class="form-group w-75 mb-2"></div>');
     var selectElem = $('<select class="form-control"></select>');
     selectElem.attr('id', category);
 
@@ -206,7 +271,7 @@ function generateCategoriesAndHandlers() {
 
   // Create the categories-wide validation button
   var validation_button = $('<form class="w-100 form-inline d-flex justify-content-center">' +
-    '<button type="submit" class="btn btn-primary mb-2">Confirm parameters</button>' +
+    '<button type="submit" class="btn btn-primary">Confirm parameters</button>' +
     '</form>');
   validation_button.submit(handleCategorySubmission);
   validation_button.appendTo(root_elem);
@@ -262,5 +327,3 @@ function generateCategoriesAndHandlers() {
 }
 
 generateCategoriesAndHandlers();
-
-
