@@ -61,8 +61,10 @@ For example, if the player comes upon a new enemy, or a breathtaking new locatio
 The image_prompt is a string that will be passed to the image generator.
 It should be a short description of the visual elements of the game state. It should not contain any information that is not already in the player_message.
 `
-var systemMessagePromptTemplate = SystemMessagePromptTemplate.fromTemplate(
-    systemMessagePromptTemplateString
+
+let systemMessagePromptTemplate = new SystemMessagePromptTemplate(
+    {systemMessagePromptTemplateString,
+    inputVariables: ["history", "traits", "location", "goal", "item"] }
 )
 
 // GAME UPDATE PARSER
@@ -77,25 +79,35 @@ const gameUpdateParserZodObj = z.object({
     image_prompt: z.string().describe("prompt to generate the image of the game state"),
 });
 
-const gameUpdateParser = StructuredOutputParser.fromZodSchema(gameUpdateParserZodObj)
+const gameUpdateParser = StructuredOutputParser.fromZodSchema(gameUpdateParserZodObj);
 const gameUpdateFormatInstructions = gameUpdateParser.getFormatInstructions();
 
+const inputVars = ["history", "input"];
 
-const chatPrompt = new ChatPromptTemplate({
+let sysMsgPromptFmtr = {
+    history: "placeholder",
+    traits: "placeholder",
+    location: "placeholder",
+    goal: "placeholder",
+    item: "placeholder",
+} 
+
+let partialVars = { "formatInstructions": gameUpdateFormatInstructions,
+                ...sysMsgPromptFmtr}
+
+
+let chatPromptTemplateInput = {
     promptMessages: [
-        systemMessagePromptTemplate.format({
-            history: 'placeholder',
-            trait: 'placeholder',
-            location: 'placeholder',
-            goal: 'placeholder',
-            item: 'placeholder',
-        }),
+        systemMessagePromptTemplate,
         new MessagesPlaceholder("history"),
         HumanMessagePromptTemplate.fromTemplate(humanMessagePromptTemplateString),
     ],
-    inputVariables: ["history", "input"],
-    partialVariables: { "formatInstructions": gameUpdateFormatInstructions },
-});
+    partialVariables: partialVars,              
+    inputVariables: inputVars,
+    outputParser: gameUpdateParser,
+}
+
+const chatPrompt = new ChatPromptTemplate(chatPromptTemplateInput);
 
 const chat = new ChatOpenAI({
     streaming: false
@@ -106,8 +118,6 @@ const chain = new ConversationChain({
     prompt: chatPrompt,
     llm: chat,
 });
-
-
 
 
 // const input = await chain.format({
