@@ -310,12 +310,31 @@ function generateCategoriesAndHandlers() {
     Object.entries(saved_categories).forEach(function ([category, value]) {
       selectedParameters.push(value);
     });
-    var aiMessage = "You have selected the following parameters: " + selectedParameters.join(", ");
+
+    window.sysMsgPromptFmtr = {
+      history: selectedParameters[0],
+      traits: selectedParameters[1],
+      location: selectedParameters[2],
+      goal: selectedParameters[3],
+      item: selectedParameters[4],
+    };
+
+    window.chain = initializeChat(sysMsgPromptFmtr);
+    const gameUpdate = await window.chain.call({
+          input: "Let's start the game",
+      });
+
+      gameUpdate
+      
+    aiMessage = 
+    // var aiMessage = "You have selected the following parameters: " + selectedParameters.join(", ");
     var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
     addAIMessage(aiMessage, aiOptions, function (aiOption) {
       addUserMessage(aiOption); // Add the AI's selected option as a user message
       $("#chat-submission-button").click(); // Trigger the button click to submit the AI's selected option
     });
+
+
   }
 
   // Function to convert a string to title case

@@ -71,7 +71,6 @@ It should be a short description of the visual elements of the game state. It sh
 
 let systemMessagePromptTemplate = SystemMessagePromptTemplate.fromTemplate(systemMessagePromptTemplateString);
 
-
 // GAME UPDATE PARSER
 const gameUpdateParserZodObj = z.object({
     player_message: z.string().describe("message that the player will see"),
@@ -89,45 +88,42 @@ const gameUpdateFormatInstructions = gameUpdateParser.getFormatInstructions();
 
 const inputVars = ["history", "input"];
 
-let sysMsgPromptFmtr = {
-    history: "placeholder",
-    traits: "placeholder",
-    location: "placeholder",
-    goal: "placeholder",
-    item: "placeholder",
+function initializeChat(sysMsgPromptFmtr) {
+
+    let partialVars = {
+        "formatInstructions": gameUpdateFormatInstructions,
+        ...sysMsgPromptFmtr
+    }
+
+    let chatPromptTemplateInput = {
+        promptMessages: [
+            systemMessagePromptTemplate,
+            new MessagesPlaceholder("history"),
+            HumanMessagePromptTemplate.fromTemplate(humanMessagePromptTemplateString),
+        ],
+        partialVariables: partialVars,
+        inputVariables: inputVars,
+        outputParser: gameUpdateParser,
+    }
+
+    const chatPrompt = new ChatPromptTemplate(chatPromptTemplateInput);
+
+    const chat = new ChatOpenAI({
+        streaming: false
+    });
+
+    const chain = new ConversationChain({
+        memory: new BufferMemory({ returnMessages: true, memoryKey: "history" }),
+        prompt: chatPrompt,
+        llm: chat,
+    });
+
+    return chain;
 }
 
-let partialVars = {
-    "formatInstructions": gameUpdateFormatInstructions,
-    ...sysMsgPromptFmtr
-}
+// const responseH = await chain.call({
+//     input: "",
+// });
 
+// console.log(responseH);
 
-let chatPromptTemplateInput = {
-    promptMessages: [
-        systemMessagePromptTemplate,
-        new MessagesPlaceholder("history"),
-        HumanMessagePromptTemplate.fromTemplate(humanMessagePromptTemplateString),
-    ],
-    partialVariables: partialVars,
-    inputVariables: inputVars,
-    outputParser: gameUpdateParser,
-}
-
-const chatPrompt = new ChatPromptTemplate(chatPromptTemplateInput);
-
-const chat = new ChatOpenAI({
-    streaming: false
-});
-
-const chain = new ConversationChain({
-    memory: new BufferMemory({ returnMessages: true, memoryKey: "history" }),
-    prompt: chatPrompt,
-    llm: chat,
-});
-
-const responseH = await chain.call({
-    input: "start",
-});
-
-console.log(responseH);
