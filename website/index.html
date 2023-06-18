@@ -9,6 +9,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kablammo&display=swap" rel="stylesheet">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -30,45 +35,40 @@
         crossorigin="anonymous"></script>
 
     <!-- Main chatbot -->
-    <div class="container-fluid d-flex justify-content-between w-100" style="height: 100vh; padding: 5vh; border: none;">
+    <div class="container-fluid d-flex justify-content-between w-100" style="height: 100vh; padding: 5vh;">
 
-        <div class="col w-50" style="border: none;">
-            <div class="card w-100 h-25 d-flex justify-content-between align-items-center" style="border: none;">
-                <div class="row h-50 w-100" >
+        <div class="col w-50">
+            <div class="card w-100 h-25 d-flex justify-content-between align-items-center"
+                style="border: none;">
+                <div class="row h-50 w-100">
                     <div class="col w-25 h-75 b-4">
+                        <!-- <a href="https://www.flaticon.com/free-icons/history" title="history icons">History icons created by Freepik - Flaticon</a>-->
                         <img class="img h-100"
-                            src="https://clipground.com/images/california-berkeley-logo-3.png">
+                            src="history-book.png">
                     </div>
                     <div class="w-75 h-75">
-                        <h2>Live your own story!</h2>
+                        <h2 style="font-family: 'Kablammo', cursive; font-size: 40px;">Live your own story!</h2>
                     </div>
                 </div>
 
                 <div class="w-50 h-100">
-                    <div class="h-50 d-flex flex-column justify-content-start" >
-                        <div class="w-100 p-1 alert-danger border border-dark rounded d-flex justify-content-between">
-                            <div class="col w-75">Health</div>
-                            <div class="col w-25">
-                                <i class="bi bi-heart-fill"></i>
-                                <i class="bi bi-heart-fill"></i>
-                                <i class="bi bi-heart-fill"></i>
-                                <i class="bi bi-heart-fill"></i>
-                                <i class="bi bi-heart-fill"></i>
+                    <div class="h-50 d-flex flex-column justify-content-start">
+                        <div class="w-100 p-1">
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 80%"
+                                    aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">Health</div>
                             </div>
                         </div>
-                        <div class="w-100 p-1 alert-warning border border-dark rounded d-flex justify-content-between">
-                            <div class="col w-75">Money</div>
-                            <div class="col w-25">
-                                <i class="bi bi-coin"></i>
-                                <i class="bi bi-coin"></i>
-                                <i class="bi bi-coin"></i>
-                                <i class="bi bi-coin"></i>
+                        <div class="w-100 p-1">
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 60%"
+                                    aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">Energy</div>
                             </div>
                         </div>
-                        <div class="w-100 p-1 alert-success border border-dark rounded d-flex justify-content-between">
-                            <div class="col w-75">Energy</div>
-                            <div class="col w-25">
-                                <i class="bi bi-lightning-charge-fill"></i>
+                        <div class="w-100 p-1">
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 40%"
+                                    aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">Money</div>
                             </div>
                         </div>
                     </div>
@@ -76,8 +76,8 @@
             </div>
 
             <div class="card w-100 h-75" style="border: none;">
-                <div class="h-100 d-flex flex-row-reverse align-content-start flex-wrap p-4" data-spy="card-body h-100"
-                    style="overflow: auto;" id="main-chat" style="border: none;">
+                <div class="h-100 d-flex flex-row-reverse align-content-start flex-wrap p-4"
+                    data-spy="card-body h-100" style="overflow: auto;" id="main-chat" style="border: none;">
                 </div>
 
                 <div class="card-footer" style="border: none;">
@@ -129,8 +129,9 @@
 
             <div class="row h-50 w-100 pl-4 pt-2">
                 <div class="card w-100 h-100" style="border: none;">
-                    <div data-spy="card-body w-100 h-100" style="overflow: auto; background-color: transparent;" id="list-parameters-data-spy">
-                        <h4 class="text-center">Select the initial parameters to generate your story</h4>
+                    <div data-spy="card-body w-100 h-100" style="overflow: auto;" id="list-parameters-data-spy"
+                        style="border: none;">
+                        <h4 class="text-center" style="font-family: 'Baloo Tammudu 2', cursive;">Select the initial parameters to generate your story</h4>
                         <div class="w-100 d-flex flex-wrap" id="list-parameters">
                         </div>
                     </div>
