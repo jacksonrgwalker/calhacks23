@@ -1,11 +1,6 @@
 <!doctype html>
 <html lang="en">
 
-<!--
-    Used bootstrap
-    Doc: https://getbootstrap.com/docs/4.0/components/scrollspy/
--->
-
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -18,7 +13,7 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <title>A great story !</title>
+    <title>A great story!</title>
 </head>
 
 <body>
@@ -41,11 +36,11 @@
             <div class="card w-100 h-25 d-flex justify-content-between align-items-center" style="border: none;">
                 <div class="row h-50 w-100">
                     <div class="col w-25 h-75 b-4">
-                        <img class="img h-100" src="https://clipground.com/images/california-berkeley-logo-3.png">
+                        <img class="img h-100"
+                            src="https://clipground.com/images/california-berkeley-logo-3.png">
                     </div>
                     <div class="w-75 h-75">
-                        <h2>Live your own fucking story!</h2>
-                        <h2>You're a big boy</h2>
+                        <h2>Live your own story!</h2>
                     </div>
                 </div>
 
@@ -86,8 +81,8 @@
                 </div>
 
                 <div class="card-footer">
-                    <form class="form-inline d-flex justify-content-betwee ">
-                        <input type="text" class="form-control w-75 pr-2" id="formGroupExampleInput"
+                    <form class="form-inline d-flex justify-content-betwee">
+                        <input type="text" class="form-control w-75 pr-2" id="chat-input"
                             placeholder="Example input">
                         <button type="submit" class="btn btn-primary w-25 pr-2" id="chat-submission-button">
                             Submit message
@@ -145,6 +140,32 @@
 
     <!-- Script of the code -->
     <script src="./main.js"></script>
+    <script>
+        $(document).ready(function () {
+            function addUserMessage() {
+                var message = $("#chat-input").val();
+                if (message.trim() === "") return;
+
+                var userMessage = '<div class="w-100 d-flex justify-content-end"><div class="w-75 alert alert-success" role="alert">' + message + '</div></div>';
+                $("#main-chat").append(userMessage);
+                scrollLast();
+
+                // Clear the input field
+                $("#chat-input").val("");
+            }
+
+            function scrollLast() {
+                var target = $("#main-chat");
+                var scrollHeight = target.prop("scrollHeight");
+                target.scrollTop(scrollHeight);
+            }
+
+            $("#chat-submission-button").click(function (event) {
+                event.preventDefault();
+                addUserMessage();
+            });
+        });
+    </script>
 </body>
 
 </html>
