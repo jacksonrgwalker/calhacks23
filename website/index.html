@@ -12,7 +12,6 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <script src="./game.js"></script>
 
     <title>A great story!</title>
 </head>
@@ -31,11 +30,11 @@
         crossorigin="anonymous"></script>
 
     <!-- Main chatbot -->
-    <div class="container-fluid d-flex justify-content-between w-100" style="height: 100vh; padding: 5vh;">
+    <div class="container-fluid d-flex justify-content-between w-100" style="height: 100vh; padding: 5vh; border: none;">
 
-        <div class="col w-50">
+        <div class="col w-50" style="border: none;">
             <div class="card w-100 h-25 d-flex justify-content-between align-items-center" style="border: none;">
-                <div class="row h-50 w-100">
+                <div class="row h-50 w-100" >
                     <div class="col w-25 h-75 b-4">
                         <img class="img h-100"
                             src="https://clipground.com/images/california-berkeley-logo-3.png">
@@ -46,7 +45,7 @@
                 </div>
 
                 <div class="w-50 h-100">
-                    <div class="h-50 d-flex flex-column justify-content-start">
+                    <div class="h-50 d-flex flex-column justify-content-start" >
                         <div class="w-100 p-1 alert-danger border border-dark rounded d-flex justify-content-between">
                             <div class="col w-75">Health</div>
                             <div class="col w-25">
@@ -76,13 +75,13 @@
                 </div>
             </div>
 
-            <div class="card w-100 h-75">
+            <div class="card w-100 h-75" style="border: none;">
                 <div class="h-100 d-flex flex-row-reverse align-content-start flex-wrap p-4" data-spy="card-body h-100"
-                    style="overflow: auto;" id="main-chat">
+                    style="overflow: auto;" id="main-chat" style="border: none;">
                 </div>
 
-                <div class="card-footer">
-                    <form class="form-inline d-flex justify-content-betwee">
+                <div class="card-footer" style="border: none;">
+                    <form class="form-inline d-flex justify-content-betwee" style="border: none;">
                         <input type="text" class="form-control w-75 pr-2" id="chat-input"
                             placeholder="Example input">
                         <button type="submit" class="btn btn-primary w-25 pr-2" id="chat-submission-button">
@@ -129,8 +128,9 @@
 
 
             <div class="row h-50 w-100 pl-4 pt-2">
-                <div class="card w-100 h-100">
-                    <div data-spy="card-body w-100 h-100" style="overflow: auto;" id="list-parameters-data-spy">
+                <div class="card w-100 h-100" style="border: none;">
+                    <div data-spy="card-body w-100 h-100" style="overflow: auto; background-color: transparent;" id="list-parameters-data-spy">
+                        <h4 class="text-center">Select the initial parameters to generate your story</h4>
                         <div class="w-100 d-flex flex-wrap" id="list-parameters">
                         </div>
                     </div>
