@@ -1,3 +1,4 @@
+// import {initializeChat} from "./game.js";
 // Contant variables
 var saved_categories = {};
 

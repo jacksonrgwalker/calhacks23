@@ -14,8 +14,6 @@ import {
 import { HumanChatMessage } from "langchain/schema";
 import { z } from "zod";
 
-
-
 const humanMessagePromptTemplateString = "Respond to the players input.\n{formatInstructions}\n{input}"
 
 const systemMessagePromptTemplateString = `
@@ -121,15 +119,15 @@ function initializeChat(sysMsgPromptFmtr) {
     return chain;
 }
 
-let chain = initializeChat(
-    {
-        history: "a sneaky bandit",
-        traits: "sneaky",
-        location: "a dark forest",
-        goal: "to find a treasure",
-        item: "a magic sword",
-    }
- );
+// let chain = initializeChat(
+//     {
+//         history: "a sneaky bandit",
+//         traits: "sneaky",
+//         location: "a dark forest",
+//         goal: "to find a treasure",
+//         item: "a magic sword",
+//     }
+//  );
 
 // const gameUpdate = await chain.call({
 //     input: "let's begin",
