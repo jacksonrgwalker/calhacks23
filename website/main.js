@@ -5,16 +5,15 @@ var saved_categories = {};
 // Main parameters of the module
 // Please also keep at the top
 const CATEGORIES = {
-  "Character": [
+  "History": [
     'A young and curious adventurer',
     'A skilled mage with a troubled past',
     'A cunning thief seeking redemption',
     'An honorable knight on a quest',
     'A wise and ancient forest spirit',
     'A lost traveler from another realm',
-    'Free Input',
   ],
-  "Main trait": [
+  "trait": [
     "Strength: Allows the character to overcome physical obstacles or engage in combat",
     "Intelligence: Helps the character solve puzzles and decipher complex riddles",
     "Agility: Enables the character to navigate treacherous terrain or evade danger",
@@ -22,7 +21,7 @@ const CATEGORIES = {
     "Perception: Helps the character notice hidden clues or detect hidden dangers",
     "Magic: Grants the character access to powerful spells and abilities",
   ],
-  "Location": [
+  "location": [
     "An ancient temple hidden deep within the forest",
     "A mystical village populated by magical creatures",
     "A dark and treacherous swamp filled with dangerous creatures",
@@ -30,7 +29,7 @@ const CATEGORIES = {
     "A forgotten library guarded by enchanted books",
     "A mystical garden blooming with rare and powerful herbs",
   ],
-  "Goal of the character": [
+  "goal": [
     "Find a way to break a powerful curse",
     "Uncover the truth behind a mysterious prophecy",
     "Retrieve a stolen artifact of immense power",
@@ -38,21 +37,13 @@ const CATEGORIES = {
     "Discover the source of a spreading corruption",
     "Save a captured loved one from an evil sorcerer",
   ],
-  "Item to start": [
+  "item": [
     "A rusty key with an unknown purpose",
     "A worn-out map with cryptic symbols",
     "A magical pendant that glows faintly",
     "A small satchel of healing herbs and potions",
     "A mysterious letter with a hidden message",
     "A silver dagger with intricate engravings",
-  ],
-  "Story": [
-    "Strength: Allows the character to overcome physical obstacles or engage in combat",
-    "Intelligence: Helps the character solve puzzles and decipher complex riddles",
-    "Agility: Enables the character to navigate treacherous terrain or evade danger",
-    "Charm: Allows the character to persuade or manipulate NPCs",
-    "Perception: Helps the character notice hidden clues or detect hidden dangers",
-    "Magic: Grants the character access to powerful spells and abilities",
   ]
 }
 
@@ -117,6 +108,11 @@ const validation_category_template = `
   </button>
 </form>`
 // Function implementation
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function(txt){
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
 function generateCategoriesAndHandlers() {
 
   // Root element for all the categories
@@ -125,7 +121,7 @@ function generateCategoriesAndHandlers() {
   // Generate all the inputs from the CATEGORIES constant
   let count = 0;
   Object.entries(CATEGORIES).forEach(function ([category, items]) {
-    var parent_elem = $(category_template.format(category));
+    var parent_elem = $(category_template.format(toTitleCase(category)));
     var form_elem = parent_elem.find("form");
 
     for (var i = 0; i < items.length; i++) {
