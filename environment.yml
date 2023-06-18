@@ -5,7 +5,10 @@ dependencies:
   - openai
   - ipykernel
   - langchain
-  - pip
-  - pip:
-    - quart
-    - quart-cors
+  - fastapi
+  - uvicorn
+  - python-dotenv
+  # - pip
+  # - pip:
+  #   - quart
+  #   - quart-cors
