@@ -1,9 +1,7 @@
 // Contant variables
-// Please keep following at the top
 var saved_categories = {};
 
 // Main parameters of the module
-// Please also keep at the top
 const CATEGORIES = {
   "History": [
     'A young and curious adventurer',
@@ -45,9 +43,9 @@ const CATEGORIES = {
     "A mysterious letter with a hidden message",
     "A silver dagger with intricate engravings",
   ]
-}
+};
 
-/// Helper function to replace vars into a string
+// Helper function to replace vars into a string
 String.prototype.format = function () {
   var args = arguments;
   return this.replace(/{(\d+)}/g, function (match, index) {
@@ -56,111 +54,188 @@ String.prototype.format = function () {
 };
 
 // Helper function to generate a modal 
-// Params: title (str) and content (str)
 function createModal(title, content) {
-  var modaL_template = `
-  <div class="modal fade" id="exampleModal" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-            {0}
-          </h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          {1}
+  var modal_template = `
+    <div class="modal fade" id="exampleModal" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              {0}
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {1}
+          </div>
         </div>
       </div>
     </div>
-    `
-  var modal = $(modaL_template.format(title, content))
+  `;
+  var modal = $(modal_template.format(title, content));
   modal.modal('show');
   modal.appendTo($(document));
 }
 
-// Helper function to generate categories and add the handler
-// Main placeholder of a category
-const category_template = `
-<div class="card w-50">
-  <div class="card-header">{0}</div>
-  <div class="card-body">
-      <form type="radio" id={0}>
-      </form>
-  </div>
-</div>`
-// Element for a category
-const category_element_template = `
-<div class="form-check">
-  <label class="form-check-label" for="exampleRadios{0}">
-    <input class="form-check-input" type="radio" name="exampleRadios"
-      id="exampleRadios{0}">
-    <text>{1}<text/>
-  </label>
-</div>`
-// Categories-common validation button
-const validation_category_template = `
-<form class="w-100 form-inline d-flex justify-content-center">
-  <button type="submit preferences" class="btn btn-primary mb-2">
-    Confirm parameters
-  </button>
-</form>`
-// Function implementation
-function toTitleCase(str) {
-  return str.replace(/\w\S*/g, function(txt){
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+// Function to add a user message to the chat
+function addUserMessage(message) {
+  var userMessage = `<div class="w-100 d-flex justify-content-end"><div class="w-75 alert alert-success" role="alert">${message}</div></div>`;
+  $("#main-chat").append(userMessage);
+  scrollLast();
+}
+
+// Function to add an AI message to the chat
+function addAIMessage(message, options, callback) {
+  var aiMessage = `<div class="w-100 d-flex justify-content-start"><div class="w-75 alert alert-info" role="alert">${message}</div></div>`;
+  $("#main-chat").append(aiMessage);
+  scrollLast();
+
+  // Generate message selection modal
+  addAIMessageSelector(options, callback);
+}
+
+// Function to add a message selection modal in bootstrap
+function addAIMessageSelector(options, callback) {
+  var options_elem = $('<div class="w-100 d-flex justify-content-start"><div class="w-75 list-group"></div></div>');
+  var options_elem_list = options_elem.find(".list-group");
+
+  for (var i = 0; i < options.length; i++) {
+    var button = $(`<button type="button" class="list-group-item list-group-item-action">${options[i]}</button>`);
+    options_elem_list.append(button);
+
+    button.click(function (event) {
+      event.preventDefault();
+      var selectedOption = $(this).text();
+      options_elem.remove();
+      callback(selectedOption); // Trigger the callback with the selected option
+      simulateAIResponse(selectedOption); // Simulate AI response after option selection
+    });
+  }
+
+  options_elem.appendTo($("#main-chat"));
+  scrollLast();
+}
+
+// Function to scroll to the last element of the chat
+function scrollLast() {
+  var target = $("#main-chat");
+  var scrollHeight = target.prop("scrollHeight");
+  target.scrollTop(scrollHeight);
+}
+
+// Function to simulate AI response
+function simulateAIResponse(option) {
+  // Replace this with your actual AI response logic
+  var aiMessage = "This is the AI's response to the selected option: " + option;
+  var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
+  addAIMessage(aiMessage, aiOptions, function (aiOption) {
+    addUserMessage(aiOption); // Add the AI's selected option as a user message
+    $("#chat-submission-button").click(); // Trigger the button click to submit the AI's selected option
   });
 }
-function generateCategoriesAndHandlers() {
 
-  // Root element for all the categories
+$(document).ready(function () {
+  // Event listener for the "Submit message" button
+  $("#chat-submission-button").click(function (event) {
+    event.preventDefault();
+    var userMessage = $("#chat-input").val().trim();
+
+    if (userMessage !== "") {
+      addUserMessage(userMessage);
+      $("#chat-input").val("");
+
+      // Simulate AI response after a short delay
+      setTimeout(function () {
+        var aiMessage = "This is the AI's response to your message: " + userMessage;
+        var options = ["Option 1", "Option 2", "Option 3"]; // Replace with your actual options
+
+        addAIMessage(aiMessage, options, function (option) {
+          addUserMessage(option); // Add the selected option as a user message
+          $("#chat-submission-button").click(); // Trigger the button click to submit the selected option
+        });
+      }, 1000);
+    }
+  });
+
+  // Event listener for pressing Enter key in the input field
+  $("#chat-input").keypress(function (event) {
+    if (event.which === 13) {
+      event.preventDefault();
+      $("#chat-submission-button").click();
+    }
+  });
+
+  // Toggle sidebar
+  $("#toggle-sidebar").click(function (event) {
+    event.preventDefault();
+    $("#sidebar").toggleClass("active");
+  });
+
+  // Clear chat
+  $("#clear-chat").click(function (event) {
+    event.preventDefault();
+    $("#main-chat").empty();
+  });
+});
+
+// Generate categories and handlers
+function generateCategoriesAndHandlers() {
   var root_elem = $("#list-parameters");
 
   // Generate all the inputs from the CATEGORIES constant
   let count = 0;
   Object.entries(CATEGORIES).forEach(function ([category, items]) {
-    var parent_elem = $(category_template.format(toTitleCase(category)));
+    var parent_elem = $(`<div class="card w-50">
+                            <div class="card-header">${toTitleCase(category)}</div>
+                            <div class="card-body">
+                              <form type="radio" id="${category}"></form>
+                            </div>
+                          </div>`);
     var form_elem = parent_elem.find("form");
 
     for (var i = 0; i < items.length; i++) {
-      var element = $(category_element_template.format(count++, items[i]));
+      var element = $(`<div class="form-check">
+                          <label class="form-check-label" for="exampleRadios${count}">
+                            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios${count}">
+                            <text>${items[i]}</text>
+                          </label>
+                        </div>`);
       element.appendTo(form_elem);
+      count++;
     }
     parent_elem.appendTo(root_elem);
   });
 
-  // Create the categories wide validation button
-  validation_button = $(validation_category_template);
-  validation_button.appendTo("#list-parameters");
-  
-  // Local function to handle a click on the button
-  function handleClick() {
-    // Prevent default behavior
+  // Create the categories-wide validation button
+  var validation_button = $(`<form class="w-100 form-inline d-flex justify-content-center">
+                              <button type="submit" class="btn btn-primary mb-2">
+                                Confirm parameters
+                              </button>
+                            </form>`);
+  validation_button.submit(handleCategorySubmission);
+  validation_button.appendTo(root_elem);
+
+  // Local function to handle the category submission
+  function handleCategorySubmission(event) {
     event.preventDefault();
 
     var radios = root_elem.find('form[type=radio]');
 
     for (var i = 0; i < radios.length; i++) {
-      // Get the name of the category
       var radio_id = $(radios[i]).attr("id");
-
-      // Selected all checked inputs
       var inputs = $(radios[i]).find("input[type=radio]");
       inputs = inputs.filter(":checked");
 
-      if (inputs.length == 0) {
-        // ERROR: Generate corresponding modal
+      if (inputs.length === 0) {
         createModal(
-          title = "Error",
-          content = "Category ``{0}`` has no checked element".format(radio_id),
+          "Error",
+          `Category "${radio_id}" has no checked element.`
         );
         return;
       }
 
-      // There can only be one checked element
-      // Recover the text from this element
       var value = $(inputs[0]).parent().find("text").text();
       saved_categories[radio_id] = value;
     }
@@ -173,93 +248,28 @@ function generateCategoriesAndHandlers() {
       }
     }
 
-    // Remove validation buttion
+    // Remove validation button
     validation_button.remove();
-  };
 
-  validation_button.click(handleClick);
-}
-
-// Helper functions to add a user message to the chat
-// Templates
-var user_message_template = `
-<div class="w-100 d-flex justify-content-end">
-  <div class="w-75 alert alert-success" role="alert">
-    {0}
-  </div>
-</div>
-`
-var ai_message_context_template = `
-<div class="w-100 d-flex ajustify-content-start">
-  <div class="w-100 alert alert-info" role="alert">
-    {0}
-  </div>
-</div>
-`
-var ai_message_selection_button_template =`
-<button 
-  type="button" 
-  class="list-group-item list-group-item-action" 
-  id="button-choice-{0}"
->
-  {1}
-</button>
-`
-var ai_message_selection_template = `
-<div class="w-100 d-flex ajustify-content-start">
-  <div class="w-75 list-group" >
-  </div>
-</div>
-`
-/// Scroll to the last element of the chat
-function scrollLast() {
-  var target = $("#main-chat");
-  var scrollHeight = target.prop("scrollHeight");
-  target.scrollTop(scrollHeight);
-}
-/// Add user message to chat
-function addUserMessage(message) {
-  let box = $(user_message_template.format(message));
-  box.appendTo($("#main-chat"));
-} 
-/// Add AI message to chat
-function addAIContextMessage(message) {
-  let box = $(ai_message_context_template.format(message));
-  box.appendTo($("#main-chat"));
-  scrollLast();
-} 
-// Add message selection modal in bootstrap
-function addAIMessageSelector(options) {
-  var options_elem = $(ai_message_selection_template);
-  var options_elem_list = $(options_elem.find("div.list-group"));
-  console.log(options_elem_list);
-
-  for (var i = 0; i < options.length; i++) {
-    var button = $(ai_message_selection_button_template.format(
-      i,
-      options[i],
-    ));
-    button.appendTo(options_elem_list);
-
-    // Disable all buttons and activate relevant one
-    $(button).click((event) => {
-      // Prevent default behavior
-      event.preventDefault();
-      // Disable all buttons
-      let buttons = $(options_elem.find("div.list-group")).find("button");
-      buttons.prop("disabled", true);
-      // Only toggle wanted button as active
-      $(event.target).addClass("active");
+    // Generate AI message with selected parameters
+    var selectedParameters = [];
+    Object.entries(saved_categories).forEach(function ([category, value]) {
+      selectedParameters.push(value);
+    });
+    var aiMessage = "You have selected the following parameters: " + selectedParameters.join(", ");
+    var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
+    addAIMessage(aiMessage, aiOptions, function (aiOption) {
+      addUserMessage(aiOption); // Add the AI's selected option as a user message
+      $("#chat-submission-button").click(); // Trigger the button click to submit the AI's selected option
     });
   }
 
-  options_elem.appendTo($("#main-chat"));
-  scrollLast();
+  // Function to convert a string to title case
+  function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  }
 }
 
-$(document).ready(function () {
-  generateCategoriesAndHandlers();
-  addUserMessage("You decided to code yet another feature");
-  addAIContextMessage("Context: you're trying to sleep ?");
-  addAIMessageSelector([1, 2, 3, 4, 5, ]);
-});
+generateCategoriesAndHandlers();
