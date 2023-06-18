@@ -4,28 +4,28 @@ var saved_categories = {};
 // Main parameters of the module
 const CATEGORIES = {
   "History": [
-    'A young and curious adventurer',
-    'A skilled mage with a troubled past',
-    'A cunning thief seeking redemption',
-    'An honorable knight on a quest',
-    'A wise and ancient forest spirit',
-    'A lost traveler from another realm',
+    '🐊 A young and curious adventurer',
+    '🧙‍♂️ A skilled mage with a troubled past',
+    '👩‍🎨 A cunning thief seeking redemption',
+    '🥷 An honorable knight on a quest',
+    '😵‍💫 A wise and ancient forest spirit',
+    '🧳 A lost traveler from another realm',
   ],
   "trait": [
-    "Strength: Allows the character to overcome physical obstacles or engage in combat",
-    "Intelligence: Helps the character solve puzzles and decipher complex riddles",
-    "Agility: Enables the character to navigate treacherous terrain or evade danger",
-    "Charm: Allows the character to persuade or manipulate NPCs",
-    "Perception: Helps the character notice hidden clues or detect hidden dangers",
-    "Magic: Grants the character access to powerful spells and abilities",
+    "💪 Strength: Allows the character to overcome physical obstacles or engage in combat",
+    "🧠 Intelligence: Helps the character solve puzzles and decipher complex riddles",
+    "🏃‍♀️ Agility: Enables the character to navigate treacherous terrain or evade danger",
+    "💄 Charm: Allows the character to persuade or manipulate NPCs",
+    "👀 Perception: Helps the character notice hidden clues or detect hidden dangers",
+    "🪄 Magic: Grants the character access to powerful spells and abilities",
   ],
   "location": [
-    "An ancient temple hidden deep within the forest",
-    "A mystical village populated by magical creatures",
-    "A dark and treacherous swamp filled with dangerous creatures",
-    "A towering waterfall cascading into a hidden cavern",
-    "A forgotten library guarded by enchanted books",
-    "A mystical garden blooming with rare and powerful herbs",
+    "🕍 An ancient temple hidden deep within the forest",
+    "🏙️ A mystical village populated by magical creatures",
+    "⛰️ A dark and treacherous swamp filled with dangerous creatures",
+    "💦 A towering waterfall cascading into a hidden cavern",
+    "📚 A forgotten library guarded by enchanted books",
+    "🏡 A mystical garden blooming with rare and powerful herbs",
   ],
   "goal": [
     "Find a way to break a powerful curse",
@@ -36,12 +36,12 @@ const CATEGORIES = {
     "Save a captured loved one from an evil sorcerer",
   ],
   "item": [
-    "A rusty key with an unknown purpose",
-    "A worn-out map with cryptic symbols",
-    "A magical pendant that glows faintly",
-    "A small satchel of healing herbs and potions",
-    "A mysterious letter with a hidden message",
-    "A silver dagger with intricate engravings",
+    "🔑 A rusty key with an unknown purpose",
+    "🗺️ A worn-out map with cryptic symbols",
+    "💍 A magical pendant that glows faintly",
+    "💼 A small satchel of healing herbs and potions",
+    "📩 A mysterious letter with a hidden message",
+    "🗡️ A silver dagger with intricate engravings",
   ]
 };
 
@@ -185,35 +185,29 @@ function generateCategoriesAndHandlers() {
   var root_elem = $("#list-parameters");
 
   // Generate all the inputs from the CATEGORIES constant
-  let count = 0;
   Object.entries(CATEGORIES).forEach(function ([category, items]) {
-    var parent_elem = $(`<div class="card w-50">
-                            <div class="card-header">${toTitleCase(category)}</div>
-                            <div class="card-body">
-                              <form type="radio" id="${category}"></form>
-                            </div>
-                          </div>`);
-    var form_elem = parent_elem.find("form");
+    var categoryLine = $('<div class="w-100 d-flex justify-content-start"></div>');
+    var categoryTitle = $('<div class="w-25">' + toTitleCase(category) + ':</div>');
+    categoryTitle.appendTo(categoryLine);
+
+    var selectGroup = $('<div class="form-group w-75"></div>');
+    var selectElem = $('<select class="form-control"></select>');
+    selectElem.attr('id', category);
 
     for (var i = 0; i < items.length; i++) {
-      var element = $(`<div class="form-check">
-                          <label class="form-check-label" for="exampleRadios${count}">
-                            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios${count}">
-                            <text>${items[i]}</text>
-                          </label>
-                        </div>`);
-      element.appendTo(form_elem);
-      count++;
+      var option = $('<option value="' + items[i] + '">' + items[i] + '</option>');
+      option.appendTo(selectElem);
     }
-    parent_elem.appendTo(root_elem);
+
+    selectElem.appendTo(selectGroup);
+    selectGroup.appendTo(categoryLine);
+    categoryLine.appendTo(root_elem);
   });
 
   // Create the categories-wide validation button
-  var validation_button = $(`<form class="w-100 form-inline d-flex justify-content-center">
-                              <button type="submit" class="btn btn-primary mb-2">
-                                Confirm parameters
-                              </button>
-                            </form>`);
+  var validation_button = $('<form class="w-100 form-inline d-flex justify-content-center">' +
+    '<button type="submit" class="btn btn-primary mb-2">Confirm parameters</button>' +
+    '</form>');
   validation_button.submit(handleCategorySubmission);
   validation_button.appendTo(root_elem);
 
@@ -221,31 +215,26 @@ function generateCategoriesAndHandlers() {
   function handleCategorySubmission(event) {
     event.preventDefault();
 
-    var radios = root_elem.find('form[type=radio]');
+    var selects = root_elem.find('select');
 
-    for (var i = 0; i < radios.length; i++) {
-      var radio_id = $(radios[i]).attr("id");
-      var inputs = $(radios[i]).find("input[type=radio]");
-      inputs = inputs.filter(":checked");
+    for (var i = 0; i < selects.length; i++) {
+      var select_id = $(selects[i]).attr("id");
+      var selectedOption = $(selects[i]).val();
 
-      if (inputs.length === 0) {
+      if (selectedOption === null) {
         createModal(
           "Error",
-          `Category "${radio_id}" has no checked element.`
+          'Category "' + select_id + '" has no selected option.'
         );
         return;
       }
 
-      var value = $(inputs[0]).parent().find("text").text();
-      saved_categories[radio_id] = value;
+      saved_categories[select_id] = selectedOption;
     }
 
     // Disable all elements
-    for (var i = 0; i < radios.length; i++) {
-      var inputs = $(radios[i]).find("input[type=radio]");
-      for (var j = 0; j < inputs.length; j++) {
-        $(inputs[j]).prop("disabled", true);
-      }
+    for (var i = 0; i < selects.length; i++) {
+      $(selects[i]).prop("disabled", true);
     }
 
     // Remove validation button
@@ -273,3 +262,5 @@ function generateCategoriesAndHandlers() {
 }
 
 generateCategoriesAndHandlers();
+
+
