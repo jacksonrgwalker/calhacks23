@@ -277,7 +277,7 @@ function generateCategoriesAndHandlers() {
   validation_button.appendTo(root_elem);
 
   // Local function to handle the category submission
-  function handleCategorySubmission(event) {
+  async function handleCategorySubmission(event) {
     event.preventDefault();
 
     var selects = root_elem.find('select');
@@ -321,20 +321,37 @@ function generateCategoriesAndHandlers() {
 
     window.chain = initializeChat(sysMsgPromptFmtr);
     const gameUpdate = await window.chain.call({
-          input: "Let's start the game",
-      });
+      input: "Let's start the game",
+    });
 
-      gameUpdate
-      
-    aiMessage = 
     // var aiMessage = "You have selected the following parameters: " + selectedParameters.join(", ");
-    var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
+    // var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
+    var aiMessage = gameUpdate.response.player_message
+    var aiOptions = gameUpdate.response.action_options
+
+    updateHealthBar(gameUpdate.response.player_stats[0]);
+    updateEnergyBar(gameUpdate.response.player_stats[1]);
+    updateMoneyBar(gameUpdate.response.player_stats[2]);
+
     addAIMessage(aiMessage, aiOptions, function (aiOption) {
       addUserMessage(aiOption); // Add the AI's selected option as a user message
       $("#chat-submission-button").click(); // Trigger the button click to submit the AI's selected option
     });
+  }
 
+  function updateHealthBar(health) {
+    var healthBar = $("#healthbar");
+    healthBar.css("width", health + "%");
+  }
 
+  function updateEnergyBar(energy) {
+    var energyBar = $("#energybar");
+    energyBar.css("width", energy + "%");
+  }
+
+  function updateMoneyBar(money) {
+    var moneyBar = $("#moneybar");
+    moneyBar.css("width", money + "%");
   }
 
   // Function to convert a string to title case

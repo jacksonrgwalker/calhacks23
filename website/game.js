@@ -121,9 +121,19 @@ function initializeChat(sysMsgPromptFmtr) {
     return chain;
 }
 
-// const responseH = await chain.call({
-//     input: "",
+let chain = initializeChat(
+    {
+        history: "a sneaky bandit",
+        traits: "sneaky",
+        location: "a dark forest",
+        goal: "to find a treasure",
+        item: "a magic sword",
+    }
+ );
+
+// const gameUpdate = await chain.call({
+//     input: "let's begin",
 // });
 
-// console.log(responseH);
+// console.log(gameUpdate);
 
