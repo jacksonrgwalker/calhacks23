@@ -1,13 +1,20 @@
-import { z } from "zod";
+import { config } from 'dotenv';
+config();
+
+import { ConversationChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
+import { BufferMemory } from "langchain/memory";
 import { OutputFixingParser, StructuredOutputParser } from "langchain/output_parsers";
 import {
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
     MessagesPlaceholder,
+    SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import { HumanChatMessage } from "langchain/schema";
+import { z } from "zod";
+
+
 
 const humanMessagePromptTemplateString = "Respond to the players input.\n{formatInstructions}\n{input}"
 
@@ -62,10 +69,8 @@ The image_prompt is a string that will be passed to the image generator.
 It should be a short description of the visual elements of the game state. It should not contain any information that is not already in the player_message.
 `
 
-let systemMessagePromptTemplate = new SystemMessagePromptTemplate(
-    {systemMessagePromptTemplateString,
-    inputVariables: ["history", "traits", "location", "goal", "item"] }
-)
+let systemMessagePromptTemplate = SystemMessagePromptTemplate.fromTemplate(systemMessagePromptTemplateString);
+
 
 // GAME UPDATE PARSER
 const gameUpdateParserZodObj = z.object({
@@ -90,10 +95,12 @@ let sysMsgPromptFmtr = {
     location: "placeholder",
     goal: "placeholder",
     item: "placeholder",
-} 
+}
 
-let partialVars = { "formatInstructions": gameUpdateFormatInstructions,
-                ...sysMsgPromptFmtr}
+let partialVars = {
+    "formatInstructions": gameUpdateFormatInstructions,
+    ...sysMsgPromptFmtr
+}
 
 
 let chatPromptTemplateInput = {
@@ -102,7 +109,7 @@ let chatPromptTemplateInput = {
         new MessagesPlaceholder("history"),
         HumanMessagePromptTemplate.fromTemplate(humanMessagePromptTemplateString),
     ],
-    partialVariables: partialVars,              
+    partialVariables: partialVars,
     inputVariables: inputVars,
     outputParser: gameUpdateParser,
 }
@@ -119,15 +126,8 @@ const chain = new ConversationChain({
     llm: chat,
 });
 
+const responseH = await chain.call({
+    input: "start",
+});
 
-// const input = await chain.format({
-//     question: "What is the capital of France?",
-// });
-// const response = await model.call(input);
-
-// console.log(input);
-
-
-// await chain.call([
-//     new HumanChatMessage("Write me a song about sparkling water."),
-// ]);
+console.log(responseH);
