@@ -1,12 +1,7 @@
-from langchain.prompts import (
-    PromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
-
-from langchain.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field, validator
 from typing import List
+
+from pydantic import BaseModel, Field
+
 
 class GameUpdate(BaseModel):
     player_message: str = Field(description="message that the player will see")
@@ -15,22 +10,43 @@ class GameUpdate(BaseModel):
         description="the player's stats (health, energy, gold)"
     )
     action_options: List[str] = Field(
-        description="list of the player's action options in order"
+        description=(
+            "list of the player's action options in order"
+            "options should be brief but descriptive and about 5-10 words long"
+        )
     )
-    can_rest: bool = Field(description="whether the player can rest at the moment")
-    can_heal: bool = Field(description="whether the player can heal at the moment")
+    can_rest: bool = Field(
+        description=(
+            "whether the player can rest at the moment"
+            "Player cannot rest in combat or if they have full energy."
+        )
+    )
+    can_heal: bool = Field(
+        description=(
+            "whether the player can heal at the moment."
+            "Player can heal if they have a healing item in their inventory or have healing abilities."
+            "Player cannot heal if they have full health."
+        )
+    )
+
+    image_prompt: str | None = Field(
+        description=(
+            "a visual description of the player's surroundings or other characters."
+            "Fed into the image generator to create an image of the scene."
+        )
+    )
 
     generate_image: bool = Field(
-        description="whether to generate an image of the game state"
+        description=(
+            "Whether to generate an image of the scene or not."
+            "True if something exciting or visually interesting is happening."
+        )
     )
-    image_prompt: str = Field(
-        description="prompt to generate the image of the game state"
-    )
+
 
 class CharSelection(BaseModel):
     background: str
     trait: str
     location: str
-    goal : str
+    goal: str
     item: str
-
