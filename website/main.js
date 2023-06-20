@@ -312,27 +312,43 @@ function generateCategoriesAndHandlers() {
       selectedParameters.push(value);
     });
 
-    window.sysMsgPromptFmtr = {
-      history: selectedParameters[0],
-      traits: selectedParameters[1],
+    sysMsgPromptFmtr = {
+      background: selectedParameters[0],
+      trait: selectedParameters[1],
       location: selectedParameters[2],
       goal: selectedParameters[3],
       item: selectedParameters[4],
     };
 
-    window.chain = initializeChat(sysMsgPromptFmtr);
-    const gameUpdate = await window.chain.call({
-      input: "Let's start the game",
+    // get game update obj from fastapi python server
+    let endpoint = "http://127.0.0.1:8000/game/start"
+
+    gameUpdatePromise = await fetch(endpoint, {
+      method: 'POST',
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Request-Methods': '*',
+
+        'Origin': 'http://jwalk.io'
+      },
+      body: JSON.stringify(sysMsgPromptFmtr)
     });
+
+    const gameUpdate = await gameUpdatePromise.json();
 
     // var aiMessage = "You have selected the following parameters: " + selectedParameters.join(", ");
     // var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
-    var aiMessage = gameUpdate.response.player_message
-    var aiOptions = gameUpdate.response.action_options
+    var aiMessage = gameUpdate.player_message
+    var aiOptions = gameUpdate.action_options
 
-    updateHealthBar(gameUpdate.response.player_stats[0]);
-    updateEnergyBar(gameUpdate.response.player_stats[1]);
-    updateMoneyBar(gameUpdate.response.player_stats[2]);
+    updateHealthBar(gameUpdate.player_stats[0]);
+    updateEnergyBar(gameUpdate.player_stats[1]);
+    updateMoneyBar(gameUpdate.player_stats[2]);
 
     addAIMessage(aiMessage, aiOptions, function (aiOption) {
       addUserMessage(aiOption); // Add the AI's selected option as a user message

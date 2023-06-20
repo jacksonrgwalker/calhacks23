@@ -9,6 +9,8 @@ from langchain.prompts import (
     MessagesPlaceholder,
     SystemMessagePromptTemplate,
 )
+from starlette.middleware.cors import CORSMiddleware
+
 
 from models import CharSelection, GameUpdate
 from prompts import human_message_prompt_template, system_message_prompt_template
@@ -25,8 +27,19 @@ human_message_prompt = HumanMessagePromptTemplate.from_template(
 
 app = FastAPI()
 
+origins = ["*"]
 
-@app.put("/game/start")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+@app.post("/game/start")
 async def start_game(char_selection: CharSelection):
     sys_msg = system_message_prompt.format(
         background=char_selection.background,
