@@ -1,4 +1,3 @@
-// import {initializeChat} from "./game.js";
 // Contant variables
 var saved_categories = {};
 
@@ -127,23 +126,48 @@ function createModal(title, content) {
 
 // Function to add a user message to the chat
 function addUserMessage(message) {
-  var userMessage = `<div class="w-100 d-flex justify-content-end"><div class="w-75 alert alert-success" role="alert">${message}</div></div>`;
-  $("#main-chat").append(userMessage);
+
+  // Create the outer bubble and set bootstrap classes
+  let userMessageBubble = document.createElement("div");
+  userMessageBubble.setAttribute("class", "w-100 d-flex justify-content-end");
+
+  // Create the inner text and set bootstrap classes
+  let userMessageText = document.createElement("div");
+  userMessageText.setAttribute("class", "w-75 alert alert-success");
+  userMessageText.setAttribute("role", "alert");
+  userMessageText.textContent = message;
+
+  // Add the text to the bubble and append the bubble to the chat
+  userMessageBubble.appendChild(userMessageText);
+  document.getElementById("main-chat").appendChild(userMessageBubble);
+
+  // Scroll to the bottom of the chat
   scrollLast();
 }
 
 // Function to add an AI message to the chat
-function addAIMessage(message, options, callback) {
-  var aiMessage = `<div class="w-100 d-flex justify-content-start"><div class="w-75 alert alert-info" role="alert">${message}</div></div>`;
-  $("#main-chat").append(aiMessage);
+function addAIMessage(message) {
+
+  // Create the outer bubble and set bootstrap classes
+  let aiMessageBubble = document.createElement("div");
+  aiMessageBubble.setAttribute("class", "w-100 d-flex justify-content-start");
+
+  // Create the inner text and set bootstrap classes
+  let aiMessageText = document.createElement("div");
+  aiMessageText.setAttribute("class", "w-75 alert alert-info");
+  aiMessageText.setAttribute("role", "alert");
+  aiMessageText.textContent = message;
+
+  // Scroll to the bottom of the chat
   scrollLast();
 
-  // Generate message selection modal
-  addAIMessageSelector(options, callback);
+  // Add the text to the bubble and append the bubble to the chat
+  aiMessageBubble.appendChild(aiMessageText);
+  document.getElementById("main-chat").appendChild(aiMessageBubble);
 }
 
 // Function to add a message selection modal in bootstrap
-function addAIMessageSelector(options, callback) {
+function addPreparedMessageSelector(options, callback) {
   var options_elem = $('<div class="w-100 d-flex justify-content-start"><div class="w-75 list-group"></div></div>');
   var options_elem_list = options_elem.find(".list-group");
 
@@ -156,7 +180,7 @@ function addAIMessageSelector(options, callback) {
       var selectedOption = $(this).text();
       options_elem.remove();
       callback(selectedOption); // Trigger the callback with the selected option
-      simulateAIResponse(selectedOption); // Simulate AI response after option selection
+      // simulateAIResponse(selectedOption); // Simulate AI response after option selection
     });
   }
 
@@ -171,60 +195,44 @@ function scrollLast() {
   target.scrollTop(scrollHeight);
 }
 
-// Function to simulate AI response
-function simulateAIResponse(option) {
-  // Replace this with your actual AI response logic
-  var aiMessage = "This is the AI's response to the selected option: " + option;
-  var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
-  addAIMessage(aiMessage, aiOptions, function (aiOption) {
-    addUserMessage(aiOption); // Add the AI's selected option as a user message
-    $("#chat-submission-button").click(); // Trigger the button click to submit the AI's selected option
-  });
-}
+// Function to handle the user message submission 
+function submitUserMessage(event) {
 
-$(document).ready(function () {
-  // Event listener for the "Submit message" button
-  $("#chat-submission-button").click(function (event) {
-    event.preventDefault();
-    var userMessage = $("#chat-input").val().trim();
+  // Get the user message from the input field
+  var userMessage = document.querySelector("#chat-input").value;
 
-    if (userMessage !== "") {
-      addUserMessage(userMessage);
-      $("#chat-input").val("");
+  // if the user message is empty, do nothing
+  if (userMessage === "") {
+    return;
+  }
 
-      // Simulate AI response after a short delay
-      setTimeout(function () {
-        var aiMessage = "This is the AI's response to your message: " + userMessage;
-        var options = ["Option 1", "Option 2", "Option 3"]; // Replace with your actual options
+  // Add the user message to the chat
+  addUserMessage(userMessage);
 
-        addAIMessage(aiMessage, options, function (option) {
-          addUserMessage(option); // Add the selected option as a user message
-          $("#chat-submission-button").click(); // Trigger the button click to submit the selected option
-        });
-      }, 1000);
-    }
-  });
+  // Senc the user message to the AI
+  sendUserMessageToAI(userMessage);
+
+  // Clear the chat input field 
+  document.querySelector("#chat-input").value = "";
+
+};
+
+function addAllEventListeners() {
+
+  // Event listener for the clicking the "Submit message" button
+  document.querySelector("#chat-submission-button").addEventListener("click", submitUserMessage);
 
   // Event listener for pressing Enter key in the input field
-  $("#chat-input").keypress(function (event) {
-    if (event.which === 13) {
-      event.preventDefault();
-      $("#chat-submission-button").click();
+  document.querySelector("#chat-input").addEventListener("keypress", function (e) {
+    // check that it was the enter key that was pressed
+    if (e.key === 'Enter') {
+      submitUserMessage(e);
     }
-  });
+  }
+  ); 
+  
+}
 
-  // Toggle sidebar
-  $("#toggle-sidebar").click(function (event) {
-    event.preventDefault();
-    $("#sidebar").toggleClass("active");
-  });
-
-  // Clear chat
-  $("#clear-chat").click(function (event) {
-    event.preventDefault();
-    $("#main-chat").empty();
-  });
-});
 
 // Generate categories and handlers
 function generateCategoriesAndHandlers() {
@@ -341,8 +349,6 @@ function generateCategoriesAndHandlers() {
 
     const gameUpdate = await gameUpdatePromise.json();
 
-    // var aiMessage = "You have selected the following parameters: " + selectedParameters.join(", ");
-    // var aiOptions = ["AI Option 1", "AI Option 2", "AI Option 3"]; // Replace with your actual AI options
     var aiMessage = gameUpdate.player_message
     var aiOptions = gameUpdate.action_options
 
@@ -350,10 +356,16 @@ function generateCategoriesAndHandlers() {
     updateEnergyBar(gameUpdate.player_stats[1]);
     updateMoneyBar(gameUpdate.player_stats[2]);
 
-    addAIMessage(aiMessage, aiOptions, function (aiOption) {
+    addAIMessage(aiMessage)
+    
+    preparedMessageCallback = function (aiOption) {
+      submitUserMessage(aiOption); // Submit the AI's selected option to the API
       addUserMessage(aiOption); // Add the AI's selected option as a user message
       $("#chat-submission-button").click(); // Trigger the button click to submit the AI's selected option
-    });
+    }
+
+    // Generate message selection modal
+    addPreparedMessageSelector(aiOptions, preparedMessageCallback);
   }
 
   function updateHealthBar(health) {
@@ -379,4 +391,5 @@ function generateCategoriesAndHandlers() {
   }
 }
 
+addAllEventListeners();
 generateCategoriesAndHandlers();
