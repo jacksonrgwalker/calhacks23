@@ -3,17 +3,18 @@ from langchain.chains import ConversationChain
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.output_parsers import PydanticOutputParser
-from langchain.prompts import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-    SystemMessagePromptTemplate,
-)
+from langchain.prompts import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                               MessagesPlaceholder,
+                               SystemMessagePromptTemplate)
 from starlette.middleware.cors import CORSMiddleware
 
-
 from models import CharSelection, GameUpdate
-from prompts import human_message_prompt_template, system_message_prompt_template
+from params import TEMPERATURE
+from prompts import (human_message_prompt_template,
+                     system_message_prompt_template)
+
+from langchain.schema import messages_from_dict, messages_to_dict
+
 
 game_update_parser = PydanticOutputParser(pydantic_object=GameUpdate)
 
@@ -36,7 +37,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 @app.post("/game/start")
@@ -67,12 +67,16 @@ async def start_game(char_selection: CharSelection):
         partial_variables=partial_variables,
     )
 
-    chat_llm = ChatOpenAI(temperature=1)
+    chat_llm = ChatOpenAI(temperature=TEMPERATURE)
     memory = ConversationBufferMemory(return_messages=True)
     conversation = ConversationChain(memory=memory, prompt=prompt, llm=chat_llm)
 
     response = conversation.predict(input="Let's Start")
     game_update = game_update_parser.parse(response)
+    game_update.previous_messages = messages_to_dict(
+        conversation.memory.chat_memory.messages
+    )
+
     return game_update
 
 

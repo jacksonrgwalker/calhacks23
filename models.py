@@ -43,6 +43,12 @@ class GameUpdate(BaseModel):
         )
     )
 
+    previous_messages: List[dict] | None = Field(
+        description=(
+            "list of previous messages in the conversation."
+            "Used to generate the next message."
+        )
+    )
 
 class CharSelection(BaseModel):
     background: str
