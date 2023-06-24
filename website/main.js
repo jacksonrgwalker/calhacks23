@@ -1,3 +1,5 @@
+API_ENDPOINT = 'http://127.0.0.1:8000'
+
 // Main parameters of the module
 const CATEGORIES = {
   "History": [
@@ -102,28 +104,28 @@ function toTitleCase(str) {
 
 // Helper function to generate a modal 
 function createModal(title, content) {
-  var modal_template = `
+  const modalTemplate = `
     <div class="modal fade" id="exampleModal" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
-              {0}
+              ${title}
             </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            {1}
+            ${content}
           </div>
         </div>
       </div>
     </div>
   `;
-  var modal = $(modal_template.format(title, content));
-  modal.modal('show');
-  modal.appendTo($(document));
+  const modal = document.createElement("div");
+  modal.innerHTML = modalTemplate.trim();
+  document.body.appendChild(modal);
 }
 
 // Function to scroll to the last element of the chat
@@ -246,6 +248,32 @@ function submitUserMessage(message) {
 
 };
 
+function sendUserMessageToAI(userMessage){
+  // Send the user message to the AI
+  fetch(API_ENDPOINT+"/game/update", {
+    method: "POST",
+    body: JSON.stringify({
+      player_move: userMessage,
+      previous_messages: document.gameUpdate.previous_messages
+    }),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Request-Methods': '*',
+      'Origin': 'http://jwalk.io'
+    },
+  })
+    .then(response => response.json())
+    .then(gameUpdate => {
+      // Get the response from the AI
+      // Add the AI message to the chat
+      addAIMessage(gameUpdate.player_message);
+      addPreparedMessageSelector(gameUpdate.action_options, submitUserMessage);
+      document.gameUpdate = gameUpdate;
+    });
+}
+
 // Populates one column of categories in the modal
 function generateCategoryLine(category, items) {
 
@@ -286,9 +314,9 @@ function populateCategoryDropdowns() {
     generateCategoryLine(category, items);
   });
 
-  Object.entries(Style_CATEGORIES).forEach(([category, items]) => {
-    generateCategoryLine(category, items);
-  });
+  // Object.entries(Style_CATEGORIES).forEach(([category, items]) => {
+  //   generateCategoryLine(category, items);
+  // });
 
 }
 
@@ -331,10 +359,7 @@ function sendCharacterSelectionToAI() {
     item: document.chosenParameters[4],
   };
 
-  // get game update obj from fastapi python server
-  let endpoint = "http://127.0.0.1:8000/game/start"
-
-  gameUpdatePromise = fetch(endpoint, {
+  document.gameUpdatePromise = fetch(API_ENDPOINT+"/game/start", {
     method: 'POST',
     mode: "cors", // no-cors, *cors, same-origin
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -347,9 +372,7 @@ function sendCharacterSelectionToAI() {
       'Origin': 'http://jwalk.io'
     },
     body: JSON.stringify(charSelection)
-  });
-
-  document.gameUpdate = gameUpdatePromise.then(response => response.json());
+  }).then(response => response.json());
 
 }
 
@@ -359,16 +382,16 @@ async function handleConfirmParameters(event) {
   event.preventDefault();
   saveAndResetChosenParameters();
   sendCharacterSelectionToAI();
-  const gameUpdate = await document.gameUpdate;
+  document.gameUpdate = await document.gameUpdatePromise;
 
-  addAIMessage(gameUpdate.player_message)
+  addAIMessage(document.gameUpdate.player_message)
 
-  updateHealthBar(gameUpdate.player_stats[0]);
-  updateEnergyBar(gameUpdate.player_stats[1]);
-  updateMoneyBar(gameUpdate.player_stats[2]);
+  updateHealthBar(document.gameUpdate.player_stats[0]);
+  updateEnergyBar(document.gameUpdate.player_stats[1]);
+  updateMoneyBar(document.gameUpdate.player_stats[2]);
 
   // Generate message selection modal
-  addPreparedMessageSelector(gameUpdate.action_options, submitUserMessage);
+  addPreparedMessageSelector(document.gameUpdate.action_options, submitUserMessage);
 }
 
 // Generate categories and handlers
