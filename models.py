@@ -2,8 +2,14 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+class CharSelection(BaseModel):
+    background: str
+    trait: str
+    location: str
+    goal: str
+    item: str
 
-class GameUpdate(BaseModel):
+class AIGameUpdate(BaseModel):
     player_message: str = Field(description="message that the player will see")
     inventory: List[str] = Field(description="list of items in the player's inventory")
     player_stats: List[int] = Field(
@@ -49,10 +55,14 @@ class GameUpdate(BaseModel):
             "Used to generate the next message."
         )
     )
+    char_selection: CharSelection | None = Field(description="the player's character selection")
 
-class CharSelection(BaseModel):
-    background: str
-    trait: str
-    location: str
-    goal: str
-    item: str
+class PlayerGameUpdate(BaseModel):
+    player_move: str = Field(description="the player's move. Could be a chosen action, or a custom message.")
+    previous_messages: List[dict] | None = Field(
+        description=(
+            "list of previous messages in the conversation."
+            "Used to generate the next AI message."
+        )
+    )
+    char_selection: CharSelection = Field(description="the player's character selection")

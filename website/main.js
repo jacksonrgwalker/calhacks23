@@ -197,7 +197,7 @@ function addAIMessage(message) {
 function addPreparedMessageSelector(options, callback) {
 
   const options_elem = document.createElement("div");
-  options_elem.classList.add("w-100", "d-flex", "justify-content-start");
+  options_elem.classList.add("w-100", "d-flex", "justify-content-start", "prepared-options");
   const options_elem_list = document.createElement("div");
   options_elem_list.classList.add("w-75", "list-group");
   options_elem.appendChild(options_elem_list);
@@ -237,6 +237,12 @@ function submitUserMessage(message) {
     return;
   }
 
+  // remove any prepared message options
+  const preparedOptions = document.querySelector(".prepared-options");
+  if (preparedOptions) {
+    preparedOptions.remove();
+  }
+
   // Add the user message to the chat
   addUserMessage(userMessage);
 
@@ -254,7 +260,8 @@ function sendUserMessageToAI(userMessage){
     method: "POST",
     body: JSON.stringify({
       player_move: userMessage,
-      previous_messages: document.gameUpdate.previous_messages
+      previous_messages: document.gameUpdate.previous_messages,
+      char_selection: document.gameUpdate.char_selection
     }),
     headers: {
       'Accept': 'application/json',
