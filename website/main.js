@@ -3,24 +3,24 @@ API_ENDPOINT = 'http://127.0.0.1:8000'
 // Main parameters of the module
 const CATEGORIES = {
   "History": [
-    '🐊 A young and curious adventurer',
-    '🧙‍♂️ A skilled mage with a troubled past',
     '👩‍🎨 A cunning thief seeking redemption',
+    '🧙‍♂️ A skilled mage with a troubled past',
+    '🐊 A young and curious adventurer',
     '🥷 An honorable knight on a quest',
     '😵‍💫 A wise and ancient forest spirit',
     '🧳 A lost traveler from another realm',
   ],
   "trait": [
+    "🏃‍♀️ Agility: Enables the character to navigate treacherous terrain or evade danger",
     "💪 Strength: Allows the character to overcome physical obstacles or engage in combat",
     "🧠 Intelligence: Helps the character solve puzzles and decipher complex riddles",
-    "🏃‍♀️ Agility: Enables the character to navigate treacherous terrain or evade danger",
     "💄 Charm: Allows the character to persuade or manipulate NPCs",
     "👀 Perception: Helps the character notice hidden clues or detect hidden dangers",
     "🪄 Magic: Grants the character access to powerful spells and abilities",
   ],
   "location": [
-    "🕍 An ancient temple hidden deep within the forest",
     "🏙️ A mystical village populated by magical creatures",
+    "🕍 An ancient temple hidden deep within the forest",
     "⛰️ A dark and treacherous swamp filled with dangerous creatures",
     "💦 A towering waterfall cascading into a hidden cavern",
     "📚 A forgotten library guarded by enchanted books",
@@ -35,12 +35,12 @@ const CATEGORIES = {
     "💖 Save a captured loved one from an evil sorcerer",
   ],
   "item": [
+    "🗡️ A silver dagger with intricate engravings",
     "🔑 A rusty key with an unknown purpose",
     "🗺️ A worn-out map with cryptic symbols",
     "💍 A magical pendant that glows faintly",
     "💼 A small satchel of healing herbs and potions",
     "📩 A mysterious letter with a hidden message",
-    "🗡️ A silver dagger with intricate engravings",
   ]
 };
 
@@ -254,9 +254,9 @@ function submitUserMessage(message) {
 
 };
 
-function sendUserMessageToAI(userMessage){
+function sendUserMessageToAI(userMessage) {
   // Send the user message to the AI
-  fetch(API_ENDPOINT+"/game/update", {
+  fetch(API_ENDPOINT + "/game/update", {
     method: "POST",
     body: JSON.stringify({
       player_move: userMessage,
@@ -278,6 +278,7 @@ function sendUserMessageToAI(userMessage){
       addAIMessage(gameUpdate.player_message);
       addPreparedMessageSelector(gameUpdate.action_options, submitUserMessage);
       document.gameUpdate = gameUpdate;
+      handleGameUpdate();
     });
 }
 
@@ -366,7 +367,7 @@ function sendCharacterSelectionToAI() {
     item: document.chosenParameters[4],
   };
 
-  document.gameUpdatePromise = fetch(API_ENDPOINT+"/game/start", {
+  document.gameUpdatePromise = fetch(API_ENDPOINT + "/game/start", {
     method: 'POST',
     mode: "cors", // no-cors, *cors, same-origin
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -393,12 +394,17 @@ async function handleConfirmParameters(event) {
 
   addAIMessage(document.gameUpdate.player_message)
 
-  updateHealthBar(document.gameUpdate.player_stats[0]);
-  updateEnergyBar(document.gameUpdate.player_stats[1]);
-  updateMoneyBar(document.gameUpdate.player_stats[2]);
+  handleGameUpdate();
 
   // Generate message selection modal
   addPreparedMessageSelector(document.gameUpdate.action_options, submitUserMessage);
+}
+
+// Update UI based on game update
+function handleGameUpdate() {
+  updateHealthBar(document.gameUpdate.player_stats[0]);
+  updateEnergyBar(document.gameUpdate.player_stats[1]);
+  updateMoneyBar(document.gameUpdate.player_stats[2]);
 }
 
 // Generate categories and handlers

@@ -10,7 +10,6 @@ class CharSelection(BaseModel):
     item: str
 
 class AIGameUpdate(BaseModel):
-    player_message: str = Field(description="message that the player will see")
     inventory: List[str] = Field(description="list of items in the player's inventory")
     player_stats: List[int] = Field(
         description="the player's stats (health, energy, gold)"
@@ -34,21 +33,10 @@ class AIGameUpdate(BaseModel):
             "Player cannot heal if they have full health."
         )
     )
+    player_message: str = Field(description="message that the player will see")
 
-    image_prompt: str | None = Field(
-        description=(
-            "a visual description of the player's surroundings or other characters."
-            "Fed into the image generator to create an image of the scene."
-        )
-    )
 
-    generate_image: bool = Field(
-        description=(
-            "Whether to generate an image of the scene or not."
-            "True if something exciting or visually interesting is happening."
-        )
-    )
-
+class AIGameUpdateExtension(AIGameUpdate):
     previous_messages: List[dict] | None = Field(
         description=(
             "list of previous messages in the conversation."
